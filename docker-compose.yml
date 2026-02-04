@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  api:
+    build: .
+    container_name: teddy_api
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: npm run start:dev
