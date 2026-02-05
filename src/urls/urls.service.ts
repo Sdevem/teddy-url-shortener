@@ -131,4 +131,30 @@ export class UrlsService {
       },
     });
   }
+
+  async softDelete(urlDto: { id: number; userId: string }) {
+    const { id, userId } = urlDto;
+
+    const url = await this.prisma.url.findFirst({
+      where: {
+        id: id,
+        deletedAt: null,
+      },
+    });
+
+    if (!url) {
+      throw new NotFoundException('URL não encontrada');
+    }
+
+    if (url.userId !== userId) {
+      throw new ForbiddenException('Acesso não autorizado');
+    }
+
+    await this.prisma.url.update({
+      where: { id: id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+  }
 }
