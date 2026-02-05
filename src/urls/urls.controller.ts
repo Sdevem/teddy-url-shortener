@@ -15,6 +15,6 @@ export class UrlsController {
     const userId = req.user?.userId ?? undefined;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    return this.urlsService.create({ originalUrl: dto.originalUrl, userId });
+    return this.urlsService.create({ originalUrl: dto.originalUrl, userId, alias: dto.alias });
   }
 }
