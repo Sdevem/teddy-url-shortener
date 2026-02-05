@@ -33,6 +33,10 @@ describe('AuthService', () => {
     usersService = moduleRef.get(UsersService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should login successfully with valid credentials', async () => {
     const password = '123456';
     const hashedPassword = await hashPassword(password);

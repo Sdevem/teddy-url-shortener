@@ -17,6 +17,8 @@ describe('UrlsService', () => {
             url: {
               findUnique: jest.fn(),
               create: jest.fn(),
+              findFirst: jest.fn(),
+              update: jest.fn(),
             },
           },
         },
@@ -25,6 +27,10 @@ describe('UrlsService', () => {
 
     service = module.get(UrlsService);
     prisma = module.get(PrismaService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should generate slug when alias is not provided', async () => {
@@ -91,5 +97,42 @@ describe('UrlsService', () => {
     });
 
     expect(result.slug).toBe('meualias');
+  });
+
+  it('should return originalUrl and increment accessCount', async () => {
+    (prisma.url.findFirst as jest.Mock).mockResolvedValue({
+      id: 1,
+      originalUrl: 'https://google.com',
+      deletedAt: null,
+    });
+
+    (prisma.url.update as jest.Mock).mockResolvedValue({});
+
+    const result = await service.findBySlugAndIncrement('abc123');
+
+    expect(prisma.url.findFirst).toHaveBeenCalledWith({
+      where: {
+        slug: 'abc123',
+        deletedAt: null,
+      },
+    });
+
+    expect(prisma.url.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: {
+        accessCount: { increment: 1 },
+      },
+    });
+
+    expect(result?.originalUrl).toBe('https://google.com');
+  });
+
+  it('should return null when url does not exist', async () => {
+    (prisma.url.findFirst as jest.Mock).mockResolvedValue(null);
+
+    const result = await service.findBySlugAndIncrement('not-found');
+
+    expect(result).toBeNull();
+    expect(prisma.url.update).not.toHaveBeenCalled();
   });
 });
