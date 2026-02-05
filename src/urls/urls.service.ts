@@ -82,7 +82,6 @@ export class UrlsService {
   }
 
   async findByUser(userId: string) {
-    console.log(userId);
     return this.prisma.url.findMany({
       where: {
         userId,
@@ -94,6 +93,7 @@ export class UrlsService {
       select: {
         id: true,
         slug: true,
+        accessCount: true,
         originalUrl: true,
         createdAt: true,
       },
@@ -156,5 +156,27 @@ export class UrlsService {
         deletedAt: new Date(),
       },
     });
+  }
+
+  async findBySlugAndIncrement(slug: string) {
+    const url = await this.prisma.url.findFirst({
+      where: {
+        slug,
+        deletedAt: null,
+      },
+    });
+
+    if (!url) return null;
+
+    await this.prisma.url.update({
+      where: { id: url.id },
+      data: {
+        accessCount: {
+          increment: 1,
+        },
+      },
+    });
+
+    return url;
   }
 }

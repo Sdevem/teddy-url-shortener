@@ -22,7 +22,6 @@ export class UrlsController {
   @Get('my-urls')
   @UseGuards(JwtAuthGuard)
   async list(@Req() req) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const userId = req.user.userId;
 
     return await this.urlsService.findByUser(userId);
