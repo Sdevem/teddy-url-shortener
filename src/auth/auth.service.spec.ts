@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { hashPassword } from '../auth/password.util';
 
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
@@ -35,7 +35,7 @@ describe('AuthService', () => {
 
   it('should login successfully with valid credentials', async () => {
     const password = '123456';
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hashPassword(password);
 
     jest.spyOn(usersService, 'findByEmail').mockResolvedValue({
       id: '1',
@@ -52,7 +52,7 @@ describe('AuthService', () => {
   });
 
   it('should throw UnauthorizedException for invalid password', async () => {
-    const hashedPassword = await bcrypt.hash('correct-password', 10);
+    const hashedPassword = await hashPassword('correct-password');
 
     jest.spyOn(usersService, 'findByEmail').mockResolvedValue({
       id: '1',

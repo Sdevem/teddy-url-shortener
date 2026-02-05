@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
+import { hashPassword } from '../auth/password.util';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await hashPassword(data.password);
 
     const user = await this.prisma.user.create({
       data: {
@@ -24,7 +24,6 @@ export class UsersService {
       },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return user;
   }
   async findByEmail(email: string) {
