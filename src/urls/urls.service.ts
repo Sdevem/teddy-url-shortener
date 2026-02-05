@@ -75,4 +75,23 @@ export class UrlsService {
       },
     });
   }
+
+  async findByUser(userId: string) {
+    console.log(userId);
+    return this.prisma.url.findMany({
+      where: {
+        userId,
+        deletedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        slug: true,
+        originalUrl: true,
+        createdAt: true,
+      },
+    });
+  }
 }

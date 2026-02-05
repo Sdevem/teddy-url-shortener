@@ -1,10 +1,10 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Get } from '@nestjs/common';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UrlsService } from './urls.service';
 import { CreateUrlDto } from './dto/create-url.dto';
 
 @Controller()
-@UseGuards(OptionalJwtAuthGuard)
 export class UrlsController {
   constructor(private readonly urlsService: UrlsService) {}
 
@@ -16,5 +16,14 @@ export class UrlsController {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     return this.urlsService.create({ originalUrl: dto.originalUrl, userId, alias: dto.alias });
+  }
+
+  @Get('my-urls')
+  @UseGuards(JwtAuthGuard)
+  async list(@Req() req) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const userId = req.user.userId;
+
+    return await this.urlsService.findByUser(userId);
   }
 }
