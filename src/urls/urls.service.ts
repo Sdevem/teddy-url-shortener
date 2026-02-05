@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { generateSlug } from './slug.util';
 
@@ -91,6 +96,38 @@ export class UrlsService {
         slug: true,
         originalUrl: true,
         createdAt: true,
+      },
+    });
+  }
+
+  async update(urlDto: { id: number; userId: string; originalUrl: string }) {
+    const { id, userId, originalUrl } = urlDto;
+
+    const url = await this.prisma.url.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+    });
+
+    if (!url) {
+      throw new NotFoundException('URL não encontrada');
+    }
+
+    if (url.userId !== userId) {
+      throw new ForbiddenException('Acesso não autorizado');
+    }
+
+    return this.prisma.url.update({
+      where: { id },
+      data: {
+        originalUrl: originalUrl,
+      },
+      select: {
+        id: true,
+        slug: true,
+        originalUrl: true,
+        updatedAt: true,
       },
     });
   }
