@@ -10,7 +10,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(email: string, password: string) {
+  async login(loginDto: { email: string; password: string }) {
+    const { email, password } = loginDto;
+
     const user = await this.usersService.findByEmail(email);
 
     if (!user) {
