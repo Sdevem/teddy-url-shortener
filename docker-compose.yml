@@ -16,12 +16,12 @@ services:
     container_name: teddy_api
     ports:
       - '3000:3000'
-    env_file:
-      - .env
     volumes:
       - .:/app
       - /app/node_modules
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      DATABASE_URL: mysql://root:root@db:3306/teddy
     command: npm run start:dev
